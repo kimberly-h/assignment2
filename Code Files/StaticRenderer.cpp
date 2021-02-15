@@ -38,14 +38,23 @@ void StaticRenderer::toggleTexture() {
 
 void StaticRenderer::toggleAmbient()
 {
+	m_ambientToggle = !m_ambientToggle;
 }
 
 void StaticRenderer::toggleSpecular()
 {
+	m_specularToggle = !m_specularToggle;
 }
 
 void StaticRenderer::toggleLighting()
 {
+	m_lightingToggle = !m_lightingToggle;
+}
+
+void StaticRenderer::toggleBoth()
+{
+	m_ambientToggle = !m_ambientToggle;
+	m_specularToggle = !m_specularToggle;
 }
 
 void StaticRenderer::Draw() {
@@ -77,7 +86,16 @@ void StaticRenderer::Draw() {
 	m_shader[currShader]->setMat4fv(transform.GetGlobal(), "ModelMatrix");
 	m_shader[currShader]->setMat3fv(transform.GetNormal(), "NormalMatrix");
 	
+	m_shader[currShader]->setVec3f(glm::vec3(0+ float(m_lightingToggle), 0 + float(m_lightingToggle), 0 + float(m_lightingToggle)), "lightColor");
 
+	//Ambient Toggle and it's intensity
+	if (m_lightingToggle)
+	{
+		m_shader[currShader]->set1f(float(m_ambientToggle), "ambientPower");
+
+		m_shader[currShader]->set1f(float(m_specularToggle), "specularStrength");
+	}
+		
 	m_vao->DrawArray();
 	m_shader[currShader]->unuse();
 	glBindVertexArray(GL_NONE);

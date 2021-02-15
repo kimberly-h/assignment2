@@ -1,5 +1,7 @@
 #include "Scene.h"
-
+std::unique_ptr<GameObject> playerEntity;
+std::unique_ptr<GameObject> CitadelEntity;
+std::unique_ptr<GameObject> icePlanetEntity;
 
 enum class EntityType { PLAYER, ENEMY };
 
@@ -7,7 +9,7 @@ enum class TextureType { START = 3, TEMPSHIP, TEMPSUN, TEMPLAVA, TEMPSAND, TEMPP
 
 enum class PlayerMesh { PLAYERSHIPPENCIL, PLAYERSHIPBAT };
 
-enum class PlanetMesh { SOLARI = 2, VERASTEN, YECHIN, KERANTIA, LUNARI, GUERISTIS, KEMINTH };
+enum class PlanetMesh { SOLARI = 2, VERASTEN, YECHIN, KERANTIA, LUNARI, GUERISTIS, KEMINTH, CITADEL };
 
 std::unique_ptr<GameObject> effect;
 
@@ -18,6 +20,7 @@ bool texTglPressed = false;
 bool bloomToggle = false;
 bool lightingTog = false;
 bool ambTog = false;
+bool specTog = false;
 bool ambSpecTog = false;
 
 Scene::Scene(string name)
@@ -59,6 +62,8 @@ Scene::Scene(string name)
 		loadOBJ("Resource Files/OBJFiles/UniverseOne/Planets/Gueristis.obj", *m_meshes[int(PlanetMesh::GUERISTIS)]);
 		m_meshes.push_back(new Mesh());
 		loadOBJ("Resource Files/OBJFiles/UniverseOne/Planets/Keminth.obj", *m_meshes[int(PlanetMesh::KEMINTH)]);
+		m_meshes.push_back(new Mesh());
+		loadOBJ("Resource Files/OBJFiles/UniverseOne/Planets/Citadel.obj", *m_meshes[int(PlanetMesh::CITADEL)]);
 	}
 }
 
@@ -220,7 +225,7 @@ void Menu::GamepadInput()
 		std::cout << "No controller connected" << std::endl;
 
 	
-
+	 
 }
 
 void Menu::Render(float deltaTime)
@@ -254,25 +259,24 @@ void Universe::InitScene()
 			camera->PerspectiveProj(1.0f, 100000.0f, Application::GetWindowWidth() / Application::GetWindowHeight(), 1.0f);
 
 			// Player
-			auto playerEntity = GameObject::Allocate();
+			 playerEntity = GameObject::Allocate();
 			MainPlayerID = playerEntity->GetID();
 			playerEntity->AttachComponent<Transform>().SetLocalPos(glm::vec3(0, 0, 0));
 			playerEntity->AttachComponent<StaticRenderer>(cameraEntity->GetID(), MainPlayerID, *m_meshes[int(PlayerMesh::PLAYERSHIPPENCIL)], m_textures[int(TextureType::TEMPSHIP)]);
 			playerEntity->GetComponent<Transform>().SetLocalScale(glm::vec3(0.75));
 			playerEntity->GetComponent<Transform>().SetLocalRot(0, 180, 0);
 			 
-			// Solari
-			auto sunEntity = GameObject::Allocate();
-			sunEntity->AttachComponent<Transform>().SetLocalPos(glm::vec3(0, 700, -300));
-			sunEntity->AttachComponent<StaticRenderer>(cameraEntity->GetID(), sunEntity->GetID(), *m_meshes[int(PlanetMesh::SOLARI)], m_textures[int(TextureType::TEMPSUN)], true);
-			sunEntity->GetComponent<Transform>().SetLocalScale(glm::vec3(3.0));
-			//sunEntity->GetComponent<Rotate>().SetLocalRotation(glm::vec3(90.0));
+			// Citadel
+			 CitadelEntity = GameObject::Allocate();
+			CitadelEntity->AttachComponent<Transform>().SetLocalPos(glm::vec3(0, 700, -300));
+			CitadelEntity->AttachComponent<StaticRenderer>(cameraEntity->GetID(), CitadelEntity->GetID(), *m_meshes[int(PlanetMesh::CITADEL)], m_textures[int(TextureType::TEMPPLANET)], true);
+			CitadelEntity->GetComponent<Transform>().SetLocalScale(glm::vec3(3.0));
 
 			// Keminth
-			auto icePlanetEntity = GameObject::Allocate();
+			 icePlanetEntity = GameObject::Allocate();
 			icePlanetEntity->AttachComponent<Transform>().SetLocalPos(glm::vec3(0, 0, 300));
 			icePlanetEntity->AttachComponent<StaticRenderer>(cameraEntity->GetID(), icePlanetEntity->GetID(), *m_meshes[int(PlanetMesh::KEMINTH)], m_textures[int(TextureType::TEMPICE)]);
-		
+			
 			//HUD
 			auto health = GameObject::Allocate();
 			health->AttachComponent<Sprite2D>(m_textures[0], health->GetID(), 15, 15);
@@ -375,32 +379,51 @@ void Universe::KeyInput()
 		playerEnt.RotateLocal(temp);
 	}
 
-	if (glfwGetKey(m_window, GLFW_KEY_1) == GLFW_PRESS && !bloomToggle) {
-		bloomToggle = true;
+	if (glfwGetKey(m_window, GLFW_KEY_1) == GLFW_PRESS && !lightingTog) {
+		lightingTog = true;
+
+		playerEntity->GetComponent<StaticRenderer>().toggleLighting();
+		CitadelEntity->GetComponent<StaticRenderer>().toggleLighting();
+		icePlanetEntity->GetComponent<StaticRenderer>().toggleLighting();
+
 	}
 	if (glfwGetKey(m_window, GLFW_KEY_1) == GLFW_RELEASE) {
-		bloomToggle = false;
+		lightingTog = false;
+		
 	}
 
-	if (glfwGetKey(m_window, GLFW_KEY_2) == GLFW_PRESS && !bloomToggle) {
-		bloomToggle = true;
+	if (glfwGetKey(m_window, GLFW_KEY_2) == GLFW_PRESS && !ambTog) {
+		ambTog = true;
+		playerEntity->GetComponent<StaticRenderer>().toggleAmbient();
+		CitadelEntity->GetComponent<StaticRenderer>().toggleAmbient();
+		icePlanetEntity->GetComponent<StaticRenderer>().toggleAmbient();
+
 	}
 	if (glfwGetKey(m_window, GLFW_KEY_2) == GLFW_RELEASE) {
-		bloomToggle = false;
+		ambTog = false;
+		
 	}
 
-	if (glfwGetKey(m_window, GLFW_KEY_3) == GLFW_PRESS && !bloomToggle) {
-		bloomToggle = true;
+	if (glfwGetKey(m_window, GLFW_KEY_3)  == GLFW_PRESS && !specTog) {
+		specTog = true;
+		playerEntity->GetComponent<StaticRenderer>().toggleSpecular();
+		CitadelEntity->GetComponent<StaticRenderer>().toggleSpecular();
+		icePlanetEntity->GetComponent<StaticRenderer>().toggleSpecular();
 	}
 	if (glfwGetKey(m_window, GLFW_KEY_3) == GLFW_RELEASE) {
-		bloomToggle = false;
+		specTog = false;
+		
 	}
 
-	if (glfwGetKey(m_window, GLFW_KEY_4) == GLFW_PRESS && !bloomToggle) {
-		bloomToggle = true;
+	if (glfwGetKey(m_window, GLFW_KEY_4) == GLFW_PRESS && !ambSpecTog) {
+		ambSpecTog = true;
+		playerEntity->GetComponent<StaticRenderer>().toggleBoth();
+		CitadelEntity->GetComponent<StaticRenderer>().toggleBoth();
+		icePlanetEntity->GetComponent<StaticRenderer>().toggleBoth();
 	}
 	if (glfwGetKey(m_window, GLFW_KEY_4) == GLFW_RELEASE) {
-		bloomToggle = false;
+		ambSpecTog = false;
+	
 	}
 
 	if (glfwGetKey(m_window, GLFW_KEY_5) == GLFW_PRESS && !bloomToggle) {

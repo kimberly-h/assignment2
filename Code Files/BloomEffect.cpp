@@ -6,7 +6,7 @@ void BloomEffect::Init(unsigned width, unsigned height)
 	
 	// 0 
 	_buffers.push_back(new FrameBuffer());
-	_buffers[index]->AddColorTarget(GL_RGBA8);
+	_buffers[index]->AddColorTarget(GL_RGBA8); 
 	_buffers[index]->Init(width, height);
 
 	//1

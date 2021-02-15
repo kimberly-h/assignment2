@@ -1,6 +1,6 @@
 #version 420
 
-layout(location = 0) in vec2 inUV;
+in vec2 TexCoords;
 
 out vec4 frag_color;
 
@@ -9,7 +9,7 @@ uniform float u_Transparency = 1.0f;
 
 void main() 
 {
-	vec4 source = texture(s_screenTex, inUV);
+	vec4 source = texture(s_screenTex, TexCoords);
 
 	frag_color.rgb = source.rgb;
 	frag_color.a = source.a * u_Transparency;

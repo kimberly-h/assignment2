@@ -22,6 +22,7 @@ public:
 	void toggleAmbient();
 	void toggleSpecular();
 	void toggleLighting();
+	void toggleBoth();
 
 	virtual void Draw();
 
