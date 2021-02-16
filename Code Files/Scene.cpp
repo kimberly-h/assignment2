@@ -22,6 +22,7 @@ bool lightingTog = false;
 bool ambTog = false;
 bool specTog = false;
 bool ambSpecTog = false;
+bool bloomState = false;
 
 Scene::Scene(string name)
 	:m_name(name)
@@ -328,7 +329,7 @@ void Universe::Update(float deltaTime)
 
 void Universe::Render(float deltaTime)
 {
-	if (bloomToggle) {
+	if (bloomState) {
 		effect->GetComponent<PostEffect>().Clear();
 		effect->GetComponent<BloomEffect>().Clear();
 
@@ -428,6 +429,10 @@ void Universe::KeyInput()
 
 	if (glfwGetKey(m_window, GLFW_KEY_5) == GLFW_PRESS && !bloomToggle) {
 		bloomToggle = true;
+		bloomState = !bloomState;
+		playerEntity->GetComponent<StaticRenderer>().toggleTrio(bloomState);
+		CitadelEntity->GetComponent<StaticRenderer>().toggleTrio(bloomState);
+		icePlanetEntity->GetComponent<StaticRenderer>().toggleTrio(bloomState);
 	}
 	if (glfwGetKey(m_window, GLFW_KEY_5) == GLFW_RELEASE) {
 		bloomToggle = false;

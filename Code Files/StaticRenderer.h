@@ -23,6 +23,7 @@ public:
 	void toggleSpecular();
 	void toggleLighting();
 	void toggleBoth();
+	void toggleTrio(bool);
 
 	virtual void Draw();
 

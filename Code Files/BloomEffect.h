@@ -7,7 +7,7 @@ class BloomEffect : public PostEffect
 public:
 
 	//Initializes framebuffer
-	//Ovverides post effect Init
+	//Overides post effect Init
 	void Init(unsigned width, unsigned height) override;
 
 	//Applies the effect to this buffer

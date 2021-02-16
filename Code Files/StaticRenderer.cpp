@@ -15,7 +15,7 @@ StaticRenderer::StaticRenderer(entt::entity camera, entt::entity entity, const M
 			m_shader.push_back(new Shader("Resource Files/Shaders/static_shader.vert", "Resource Files/Shaders/static_shader_tex_unlit.frag"));
 			m_shader.push_back(new Shader("Resource Files/Shaders/static_shader.vert", "Resource Files/Shaders/static_shader_tex_lit.frag"));
 	}
-
+	
 	SetVAO(mesh);
 }
 
@@ -57,6 +57,18 @@ void StaticRenderer::toggleBoth()
 	m_specularToggle = !m_specularToggle;
 }
 
+void StaticRenderer::toggleTrio(bool bloom)
+{
+	if (bloom) {
+		m_ambientToggle = true;
+		m_specularToggle = true;
+	}
+	else {
+		m_ambientToggle = false;
+		m_specularToggle = false;
+	}
+}
+
 void StaticRenderer::Draw() {
 	auto& transform = GameObject::GetComponent<Transform>(m_entity);
 
@@ -88,13 +100,10 @@ void StaticRenderer::Draw() {
 	
 	m_shader[currShader]->setVec3f(glm::vec3(0+ float(m_lightingToggle), 0 + float(m_lightingToggle), 0 + float(m_lightingToggle)), "lightColor");
 
-	//Ambient Toggle and it's intensity
-	if (m_lightingToggle)
-	{
-		m_shader[currShader]->set1f(float(m_ambientToggle), "ambientPower");
+	//Lighting toggles for bool
+	m_shader[currShader]->set1f(float(m_ambientToggle) * float(m_lightingToggle), "ambientPower");
 
-		m_shader[currShader]->set1f(float(m_specularToggle), "specularStrength");
-	}
+	m_shader[currShader]->set1f(float(m_specularToggle) * float(m_lightingToggle), "specularStrength");
 		
 	m_vao->DrawArray();
 	m_shader[currShader]->unuse();
